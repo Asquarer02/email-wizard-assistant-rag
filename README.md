@@ -1,32 +1,112 @@
 # Email Wizard's Assistant
+![Email Wizard Assistant Chatbot UI](./assets/chatbot_screenshot.png)
 
 This project implements an Email Wizard Assistant using a Retrieval-Augmented Generation (RAG) model to answer queries based on a provided email dataset.
 
-## Task Overview (Covered in this Phase)
+## Task Overview & Features Implemented
 
-1.  **GitHub Repository Setup:** This repository.
+1.  **GitHub Repository Setup:** This repository, structured for the project.
 2.  **RAG Model Integration:**
-    *   Embedding: OpenAI `text-embedding-3-small`
-    *   Generation: OpenAI `gpt-4o-mini`
-    *   Orchestration: LangChain
-3.  **Dataset Preparation:** Uses `proc_email.csv` (first 60 emails).
-4.  **Embedding:** Emails are embedded and stored in a FAISS vector store.
-5.  **Similarity Search:** FAISS is used for retrieving relevant emails.
-
+    *   Orchestration: LangChain framework.
+    *   Embedding: OpenAI `text-embedding-3-small` model.
+    *   Generation: OpenAI `gpt-4o-mini` model.
+3.  **Dataset Preparation:** Processing and utilization of the first 60 emails from `data/proc_email.csv`.
+4.  **Embedding & Vector Storage:** Conversion of email content into vector embeddings and storage in a FAISS index for efficient retrieval.
+5.  **Similarity Search:** Implementation of similarity search using the FAISS vector store to find relevant emails based on user queries.
+6.  **API Implementation:** A **FastAPI** backend (`main.py`, `rag_utils.py`) exposing the RAG pipeline via a `POST /query_email` endpoint, including error handling.
+7.  **Frontend Interface:** A simple, user-friendly chatbot UI (`index.html`, `script.js`, Tailwind CSS via CDN) served by FastAPI, allowing users to interact with the email assistant.
+8.  **Evaluation:** Initial performance metrics (inference speed, retrieval similarity scores) captured and reported (see Evaluation Summary section).
 ## Project Structure
-```
+```plaintext
 email-wizard-assistant-rag/
-├── .git/                 
-├── .gitignore            
-├── api/                  # For Flask/FastAPI application (to be developed)
-│   └── (empty for now)
-├── data/                 # Contains the dataset
-│   └── proc_email.csv    
-├── notebooks/            # Jupyter notebooks for development and experimentation
-│   └── email_assistant_rag.ipynb           
-├── .env          
+├── .git/
+├── .gitignore
+├── api/                  
+│   ├── static/           
+│   │   └── script.js
+│   ├── templates/        
+│   │   └── index.html
+│   ├── main.py           # FastAPI application 
+│   └── rag_utils.py      
+├── data/                 # Dataset 
+│   └── proc_email.csv
+├── faiss_index/          # Persisted FAISS vector store (created by notebook)
+│   ├── index.faiss
+│   └── index.pkl
+├── notebooks/            # Jupyter notebook for development & index creation
+│   └── email_assistant_rag.ipynb
+├── .env                  
+├── requirements.txt      
 └── README.md             
 ```
+
+## Setup Instructions
+
+1.  **Clone Repository:**
+    ```bash
+    git clone https://github.com/Asquarer02/email-wizard-assistant-rag.git
+    cd email-wizard-assistant
+    ```
+
+2.  **Create Virtual Environment (Recommended):**
+    ```bash
+    python -m venv venv
+    # Activate it:
+    # Windows:
+    venv\Scripts\activate
+    # macOS/Linux:
+    source venv/bin/activate
+    ```
+
+3.  **Install Dependencies:**
+    ```bash
+    pip install -r requirements.txt
+    ```
+    *(Note: Ensure you have necessary build tools if `faiss-cpu` or `faiss-gpu` requires compilation on your system.)*
+
+4.  **Set Up Environment Variables:**
+    *   Create a file named `.env` in the project root directory (i.e., inside `email-wizard-assistant/`).
+    *   Add your OpenAI API key to this file. **Generate a new key if you haven't already revoked the one previously committed.**
+        ```env
+        OPENAI_API_KEY="sk-YourNewValidOpenAIKeyHere"
+        ```
+    *   Make sure this `.env` file is listed in your `.gitignore` file and is **not** committed to Git.
+
+5.  **Generate FAISS Index (Required before running API):**
+    *   You need to run the Jupyter notebook first to process the emails and create the vector store index.
+    *   Start Jupyter Lab or Notebook from your project root directory:
+        ```bash
+        jupyter lab
+        # OR
+        jupyter notebook
+        ```
+    *   Open `notebooks/email_assistant_rag.ipynb`.
+    *   Ensure the `OPENAI_API_KEY` is correctly loaded from your `.env` file within the notebook environment as well.
+    *   Run all the cells in the notebook up to and including the cell that creates and saves the FAISS index (`vector_store.save_local(FAISS_INDEX_PATH)`). This will create the `faiss_index/` directory and its contents.
+
+6.  **Run the FastAPI Application:**
+    *   Make sure you are in the project root directory (`email-wizard-assistant/`) in your terminal, with your virtual environment activated.
+    *   Start the FastAPI server using Uvicorn:
+        ```bash
+        uvicorn main:app --reload --port 5001
+        ```
+        *   `main`: Refers to the file `main.py`.
+        *   `app`: Refers to the `app = FastAPI()` instance inside `main.py`.
+        *   `--reload`: Enables auto-reload for development (restart server on code changes).
+        *   `--port 5001`: Specifies the port to run on (feel free to change).
+    *   The server will start, and you should see logs indicating the RAG components are loading from `rag_utils.py`.
+
+7.  **Access the Chatbot UI:**
+    *   Open your web browser and navigate to: `http://127.0.0.1:5001` (or the port you specified).
+    *   You should see the chat interface. Type your queries and press Send or Enter.
+
+## Running the Development Notebook
+
+For development, experimentation, evaluation, or re-generating the FAISS index:
+
+1.  Ensure steps 1-4 (Clone, Env, Install, `.env` setup) from the Setup Instructions are complete.
+2.  Start Jupyter Lab or Notebook from the project root.
+3.  Open and run cells in `notebooks/email_assistant_rag.ipynb`.
 
 
 ## Evaluation

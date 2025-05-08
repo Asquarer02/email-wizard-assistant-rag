@@ -1,0 +1,12 @@
+fastapi
+uvicorn[standard] 
+jinja2          
+langchain
+langchain-community
+langchain-openai
+openai          
+tiktoken        
+faiss-cpu       
+python-dotenv   
+numpy           
+pandas          
