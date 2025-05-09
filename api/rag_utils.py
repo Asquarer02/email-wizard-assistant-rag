@@ -27,7 +27,7 @@ Question: {question}
 Helpful Answer:"""
 
 QA_PROMPT = PromptTemplate(template=prompt_template, input_variables=["context", "question"])
-llm = ChatOpenAI(model_name=LLM_MODEL_NAME, temperature=0.7")
+llm = ChatOpenAI(model_name=LLM_MODEL_NAME, temperature=0.7)
 qa_chain = RetrievalQA.from_chain_type(
     llm=llm,
     chain_type="stuff",
